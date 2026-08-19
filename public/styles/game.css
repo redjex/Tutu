@@ -107,19 +107,35 @@
 }
 .property-info__photo-view {
 	position: relative;
-	height: 230px;
+	height: 250px;
 	overflow: hidden;
 	margin-bottom: 14px;
 	border-radius: 16px;
 	background: #e9e7e0;
 }
 .property-info__photo-view > img {
+	position: absolute;
+	inset: 0;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 }
+.property-info__photo-view::after {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 43%;
+	content: "";
+	background: linear-gradient(180deg, transparent 0%, rgba(18, 18, 18, .14) 25%, rgba(18, 18, 18, .74) 100%);
+	backdrop-filter: blur(7px);
+	-webkit-backdrop-filter: blur(7px);
+	mask-image: linear-gradient(180deg, transparent 0%, #000 34%);
+	-webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 34%);
+}
 .property-info__photo-overlay {
 	position: absolute;
+	z-index: 2;
 	right: 10px;
 	bottom: 10px;
 	left: 10px;
@@ -131,6 +147,21 @@
 	font-size: 11px;
 	text-shadow: 0 1px 5px rgba(0,0,0,.45);
 }
+.property-info__rating {
+	display: block;
+	width: 92px;
+	height: 7px;
+	overflow: hidden;
+	border-radius: 999px;
+	background: rgba(255,255,255,.38);
+	box-shadow: 0 1px 4px rgba(0,0,0,.18);
+}
+.property-info__rating i {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: #fff;
+}
 .property-info__photo-overlay strong {
 	padding: 6px 8px;
 	border-radius: 999px;
@@ -141,6 +172,7 @@
 .property-info__photo-prev,
 .property-info__photo-next {
 	position: absolute;
+	z-index: 3;
 	top: 50%;
 	width: 30px;
 	height: 30px;
@@ -632,7 +664,7 @@
 	font-size: 10px;
 }
 .roll-button {
-	flex: 0 1 320px;
+	flex: 1 1 0;
 	border: 0;
 	background: var(--color-primary);
 	color: #fff;
@@ -643,6 +675,7 @@
 	background: #dc5147;
 	color: #fff;
 	font-weight: 700;
+	white-space: nowrap;
 }
 .bail-button[hidden] {
 	display: none;
@@ -665,25 +698,26 @@
 	gap: 8px;
 	width: min(320px, 100%);
 	padding: 10px;
-	border: 1px solid var(--color-line);
+	border: 0;
 	border-radius: 14px;
-	background: #f7f6f2;
+	background: transparent;
 	color: var(--color-text);
 	font-size: 10px;
 }
 .auction-actions > div {
 	display: grid;
-	grid-template-columns: 1fr .82fr;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 6px;
 }
 .auction-actions button {
-	min-height: 42px;
+	height: 42px;
 	padding: 10px;
 	border: 0;
 	border-radius: 8px;
 	background: var(--color-primary);
 	color: #fff;
 	font-size: 10px;
+	white-space: nowrap;
 }
 .auction-actions .auction-decline {
 	background: #e9e7e0;

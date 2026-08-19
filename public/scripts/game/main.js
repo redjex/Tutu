@@ -165,17 +165,14 @@ function renderPropertyInfo(index = state.inspectedIndex ?? state.position) {
     elements.propertyInfoContent.innerHTML = '<div class="property-info__empty">Выберите отель на поле, чтобы посмотреть подробности</div>';
     return;
   }
-  const group = deck.filter((item) => isBusiness(item) && item.group === tile.group);
-  const missing = group.filter((item) => item.owner !== state.userId);
   const photos = (tile.photos || []).filter(Boolean);
   const photo = photos[propertyPhotoIndex % Math.max(photos.length, 1)] || '';
-  const photoMarkup = photo ? `<div class="property-info__photo-view"><img src="${escapeHtml(photo)}" alt="${escapeHtml(tile.name)}" /><div class="property-info__photo-overlay"><span>★ ${tile.level || 1}</span><strong>${formatMoney(tile.purchasePrice)}</strong></div>${photos.length > 1 ? '<button class="property-info__photo-prev" type="button">‹</button><button class="property-info__photo-next" type="button">›</button>' : ''}</div>` : '';
-  const groupMarkup = group.map((item) => {
-    const owner = item.owner === state.userId ? 'У вас' : item.owner ? 'У другого игрока' : 'Свободен';
-    return `<div class="property-info__hotel ${item.owner === state.userId ? 'is-owned' : ''}"><span>${escapeHtml(item.name)}</span><small>${owner}</small></div>`;
-  }).join('');
+  const level = Math.max(1, Math.min(5, Number(tile.level) || 1));
+  const fullName = String(tile.name || '').trim();
+  const displayName = fullName.length > 15 ? `${fullName.slice(0, 15)}...` : fullName;
+  const photoMarkup = photo ? `<div class="property-info__photo-view"><img src="${escapeHtml(photo)}" alt="${escapeHtml(fullName)}" /><div class="property-info__photo-overlay"><span class="property-info__rating" aria-label="${level} из 5 звёзд"><i style="width:${level * 20}%"></i></span><strong>${formatMoney(tile.purchasePrice)}</strong></div>${photos.length > 1 ? '<button class="property-info__photo-prev" type="button" aria-label="Предыдущее фото">‹</button><button class="property-info__photo-next" type="button" aria-label="Следующее фото">›</button>' : ''}</div>` : '';
   const rentMarkup = [1, 2, 3, 4, 5].map((level) => `<span>${level} звёзд</span><span>${formatMoney(Math.round(tile.purchasePrice * level / 5))}</span>`).join('');
-  elements.propertyInfoContent.innerHTML = `<h2 class="property-info__title" id="property-info-title">${escapeHtml(tile.name)}</h2><p class="property-info__subtitle">${escapeHtml(tile.city || '')} · ${tile.level || 1} звёзд</p>${photoMarkup}<div class="property-info__section"><h3>Цветовая группа · ${missing.length ? `осталось ${missing.length}` : 'монополия создана'}</h3><div class="property-info__group">${groupMarkup}</div></div><div class="property-info__section"><h3>Оплата за остановку</h3><div class="property-info__table">${rentMarkup}</div></div>`;
+  elements.propertyInfoContent.innerHTML = `<h2 class="property-info__title" id="property-info-title">${escapeHtml(displayName)}</h2><p class="property-info__subtitle">${escapeHtml(tile.city || '')}</p>${photoMarkup}<div class="property-info__section"><h3>Оплата за остановку</h3><div class="property-info__table">${rentMarkup}</div></div>`;
   elements.propertyInfoContent.querySelector('.property-info__photo-prev')?.addEventListener('click', () => { propertyPhotoIndex = (propertyPhotoIndex - 1 + photos.length) % photos.length; renderPropertyInfo(index); });
   elements.propertyInfoContent.querySelector('.property-info__photo-next')?.addEventListener('click', () => { propertyPhotoIndex = (propertyPhotoIndex + 1) % photos.length; renderPropertyInfo(index); });
 }
