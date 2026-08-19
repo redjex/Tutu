@@ -64,6 +64,7 @@ type AuctionState struct {
 	SellerID        string
 	HighestBid      int
 	HighestBidderID string
+	CurrentBidderID string
 	EndsAt          time.Time
 	DeclinedIDs     map[string]bool
 }
@@ -590,6 +591,53 @@ func (room *Room) Roll(userID string) error {
 	return nil
 }
 
+const auctionTurnDuration = 15 * time.Second
+
+func (room *Room) nextAuctionBidderLocked(afterID string) string {
+	if len(room.Players) == 0 {
+		return ""
+	}
+	start := 0
+	for index, player := range room.Players {
+		if player.ID == afterID {
+			start = (index + 1) % len(room.Players)
+			break
+		}
+	}
+	for offset := 0; offset < len(room.Players); offset++ {
+		player := room.Players[(start+offset)%len(room.Players)]
+		if player.ID != room.Auction.SellerID && player.ID != room.Auction.HighestBidderID && !player.Bankrupt && !room.Auction.DeclinedIDs[player.ID] {
+			return player.ID
+		}
+	}
+	return ""
+}
+
+func (room *Room) waitForAuctionTurn(endsAt time.Time) {
+	time.Sleep(time.Until(endsAt))
+	room.mu.Lock()
+	if room.Auction == nil || !room.Auction.EndsAt.Equal(endsAt) {
+		room.mu.Unlock()
+		return
+	}
+	if room.Auction.CurrentBidderID != "" {
+		room.Auction.DeclinedIDs[room.Auction.CurrentBidderID] = true
+		room.Auction.CurrentBidderID = room.nextAuctionBidderLocked(room.Auction.CurrentBidderID)
+	}
+	if room.Auction.CurrentBidderID == "" {
+		room.mu.Unlock()
+		room.FinishAuction()
+		return
+	}
+	room.Auction.EndsAt = time.Now().Add(auctionTurnDuration)
+	room.Message = "Время на ставку истекло"
+	room.Version++
+	nextEndsAt := room.Auction.EndsAt
+	room.mu.Unlock()
+	room.Broadcast()
+	go room.waitForAuctionTurn(nextEndsAt)
+}
+
 func (room *Room) StartAuction(userID string) error {
 	room.mu.Lock()
 	defer room.mu.Unlock()
@@ -600,15 +648,13 @@ func (room *Room) StartAuction(userID string) error {
 	if player == nil || player.ID != userID {
 		return errors.New("аукцион может начать только игрок, которому выпал отель")
 	}
-	room.Auction = &AuctionState{TileIndex: player.Position, SellerID: userID, EndsAt: time.Now().Add(10 * time.Second), DeclinedIDs: map[string]bool{}}
+	room.Auction = &AuctionState{TileIndex: player.Position, SellerID: userID, HighestBid: room.Deck[player.Position].PurchasePrice, EndsAt: time.Now().Add(auctionTurnDuration), DeclinedIDs: map[string]bool{}}
+	room.Auction.CurrentBidderID = room.nextAuctionBidderLocked(userID)
 	room.AwaitingActionType = "auction"
 	room.Message = fmt.Sprintf("%s выставил отель на аукцион", player.Name)
 	room.Version++
 	endsAt := room.Auction.EndsAt
-	go func() {
-		time.Sleep(time.Until(endsAt))
-		room.FinishAuction()
-	}()
+	go room.waitForAuctionTurn(endsAt)
 	return nil
 }
 
@@ -623,7 +669,7 @@ func (room *Room) Bid(userID string, amount int) error {
 		room.FinishAuction()
 		return errors.New("аукцион уже завершён")
 	}
-	if userID == room.Auction.SellerID || room.Auction.DeclinedIDs[userID] || amount < 100 || amount%100 != 0 || amount <= room.Auction.HighestBid {
+	if userID != room.Auction.CurrentBidderID || userID == room.Auction.SellerID || room.Auction.DeclinedIDs[userID] || amount != room.Auction.HighestBid+100 {
 		room.mu.Unlock()
 		return errors.New("ставка должна быть выше текущей минимум на 100")
 	}
@@ -634,21 +680,44 @@ func (room *Room) Bid(userID string, amount int) error {
 	}
 	room.Auction.HighestBid = amount
 	room.Auction.HighestBidderID = userID
+	room.Auction.CurrentBidderID = room.nextAuctionBidderLocked(userID)
+	room.Auction.EndsAt = time.Now().Add(auctionTurnDuration)
+	endsAt := room.Auction.EndsAt
+	finished := room.Auction.CurrentBidderID == ""
 	room.Message = fmt.Sprintf("%s поставил %d", player.Name, amount)
 	room.Version++
 	room.mu.Unlock()
+	if finished {
+		room.FinishAuction()
+		return nil
+	}
 	room.Broadcast()
+	go room.waitForAuctionTurn(endsAt)
 	return nil
 }
 
 func (room *Room) DeclineAuction(userID string) error {
 	room.mu.Lock()
-	defer room.mu.Unlock()
 	if room.Auction == nil || userID == room.Auction.SellerID {
 		return errors.New("отказ от аукциона сейчас недоступен")
 	}
 	room.Auction.DeclinedIDs[userID] = true
+	if userID != room.Auction.CurrentBidderID {
+		room.mu.Unlock()
+		return errors.New("отказаться можно только в свой ход аукциона")
+	}
+	room.Auction.CurrentBidderID = room.nextAuctionBidderLocked(userID)
+	if room.Auction.CurrentBidderID == "" {
+		room.mu.Unlock()
+		room.FinishAuction()
+		return nil
+	}
+	room.Auction.EndsAt = time.Now().Add(auctionTurnDuration)
+	endsAt := room.Auction.EndsAt
 	room.Version++
+	room.mu.Unlock()
+	room.Broadcast()
+	go room.waitForAuctionTurn(endsAt)
 	return nil
 }
 
@@ -762,7 +831,7 @@ func (room *Room) snapshotLocked(userID string) RoomSnapshot {
 		for id := range value.DeclinedIDs {
 			declined = append(declined, id)
 		}
-		auction = &AuctionSnapshot{TileIndex: value.TileIndex, SellerID: value.SellerID, HighestBid: value.HighestBid, HighestBidderID: value.HighestBidderID, EndsAt: value.EndsAt, DeclinedIDs: declined}
+		auction = &AuctionSnapshot{TileIndex: value.TileIndex, SellerID: value.SellerID, HighestBid: value.HighestBid, HighestBidderID: value.HighestBidderID, CurrentBidderID: value.CurrentBidderID, EndsAt: value.EndsAt, DeclinedIDs: declined}
 	}
 	return RoomSnapshot{ID: room.ID, Status: room.Status, Players: players, Deck: deck, TurnPlayerID: turnPlayerID, AwaitingActionID: room.AwaitingActionID, AwaitingActionType: room.AwaitingActionType, YouID: userID, Message: room.Message, LastDice: room.LastDice, Version: room.Version, Source: room.Pools.Source, Settings: room.Settings, Auction: auction}
 }

@@ -116,6 +116,7 @@ type AuctionSnapshot struct {
 	SellerID        string    `json:"sellerId"`
 	HighestBid      int       `json:"highestBid"`
 	HighestBidderID string    `json:"highestBidderId,omitempty"`
+	CurrentBidderID string    `json:"currentBidderId,omitempty"`
 	EndsAt          time.Time `json:"endsAt"`
 	DeclinedIDs     []string  `json:"declinedIds,omitempty"`
 }

@@ -133,11 +133,12 @@ function updateAuctionUI() {
   elements.auctionActions.hidden = state.revealing || (!active && !(state.awaitingActionId === state.userId && state.awaitingActionType === 'buy'));
   elements.auctionStartButton.hidden = true;
   const declined = active && auction.declinedIds?.includes(state.userId);
-  elements.auctionBidButton.hidden = !active || auction.sellerId === state.userId || declined;
-  elements.auctionDeclineButton.hidden = !active || auction.sellerId === state.userId || declined;
+  const isAuctionTurn = active && auction.currentBidderId === state.userId;
+  elements.auctionBidButton.hidden = !isAuctionTurn || declined;
+  elements.auctionDeclineButton.hidden = !isAuctionTurn || declined;
   if (!active) return;
   const remaining = Math.max(0, Math.ceil((new Date(auction.endsAt).getTime() - Date.now()) / 1000));
-  elements.auctionStatus.textContent = declined ? 'Вы отказались от участия' : `Ставка: ${formatMoney(auction.highestBid || 0)} · ${remaining} сек.`;
+  elements.auctionStatus.textContent = declined ? 'Вы отказались от участия' : `${isAuctionTurn ? 'Ваш ход' : 'Ход соперника'} · ${formatMoney(auction.highestBid || 0)} · ${remaining} сек.`;
 }
 
 function drawBoard() {

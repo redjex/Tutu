@@ -10,4 +10,5 @@ __pycache__/
 .local-logs/
 .local-bin/
 .local-go-cache/
+.tmp-go-cache/
 *.tar
