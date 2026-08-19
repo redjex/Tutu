@@ -225,6 +225,16 @@
 	font-weight: 700;
 	text-align: right;
 }
+.property-info__rent-stars {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+}
+.property-info__rent-stars img {
+	width: 11px;
+	height: 11px;
+	object-fit: contain;
+}
 .property-info__group {
 	display: grid;
 	gap: 5px;
