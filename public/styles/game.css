@@ -68,7 +68,7 @@
 	width: min(430px, 100%);
 	max-height: min(720px, calc(100vh - 44px));
 	overflow: auto;
-	padding: 24px;
+	padding: 0;
 	border: 1px solid var(--color-line);
 	border-radius: 28px;
 	background: #f8f7f3;
@@ -101,27 +101,38 @@
 	line-height: 1.1;
 }
 .property-info__subtitle {
-	margin: 5px 0 12px;
-	color: var(--color-muted);
+	margin: 5px 0 0;
+	color: rgba(255,255,255,.78);
 	font-size: 10px;
 }
 .property-info__photo-view {
 	position: relative;
-	height: 250px;
+	height: min(360px, 58vh);
 	overflow: hidden;
-	margin-bottom: 14px;
-	border-radius: 16px;
+	border-radius: 27px 27px 0 0;
 	background: #e9e7e0;
 }
 .property-info__photo-view > img {
 	position: absolute;
 	inset: 0;
+	z-index: 0;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 }
+.property-info__photo-view::before {
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	right: 0;
+	left: 0;
+	height: 34%;
+	content: "";
+	background: linear-gradient(180deg, rgba(0,0,0,.48), transparent);
+}
 .property-info__photo-view::after {
 	position: absolute;
+	z-index: 1;
 	right: 0;
 	bottom: 0;
 	left: 0;
@@ -148,18 +159,19 @@
 	text-shadow: 0 1px 5px rgba(0,0,0,.45);
 }
 .property-info__rating {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+}
+.property-info__rating-bar {
 	display: block;
-	width: 92px;
+	width: 17px;
 	height: 7px;
-	overflow: hidden;
 	border-radius: 999px;
-	background: rgba(255,255,255,.38);
+	background: rgba(255,255,255,.36);
 	box-shadow: 0 1px 4px rgba(0,0,0,.18);
 }
-.property-info__rating i {
-	display: block;
-	height: 100%;
-	border-radius: inherit;
+.property-info__rating-bar.is-filled {
 	background: #fff;
 }
 .property-info__photo-overlay strong {
@@ -186,8 +198,18 @@
 }
 .property-info__photo-prev { left: 10px; }
 .property-info__photo-next { right: 10px; }
+.property-info__photo-copy {
+	position: absolute;
+	z-index: 2;
+	top: 25px;
+	right: 58px;
+	left: 24px;
+	color: #fff;
+	text-shadow: 0 1px 7px rgba(0,0,0,.45);
+}
 .property-info__section {
-	margin-top: 14px;
+	margin: 0;
+	padding: 14px 24px 24px;
 }
 .property-info__section h3 {
 	margin: 0 0 7px;
