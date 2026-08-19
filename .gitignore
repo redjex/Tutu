@@ -4,7 +4,6 @@ node_modules/
 npm-debug.log*
 .DS_Store
 Thumbs.db
-README.md
 __pycache__/
 *.pyc
 .local-logs/
@@ -12,3 +11,4 @@ __pycache__/
 .local-go-cache/
 .tmp-go-cache/
 *.tar
+tutu-monopoly
