@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Монополия — игра</title>
+    <link rel="icon" href="/assets/images/tutu.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles/base.css" />
+    <link rel="stylesheet" href="/styles/game.css" />
+  </head>
+  <body>
+    <main class="game-page">
+      <header class="game-header">
+        <div class="header-actions"><button class="rules-button" id="rules-button" type="button">Правила</button><button class="rules-button" id="invite-button" type="button">Пригласить</button><button class="leave-button" type="button">Выйти</button></div>
+      </header>
+
+      <div class="game-layout">
+        <aside class="player-rail" aria-label="Игроки">
+          <div class="rail-player rail-player--you"><div class="rail-avatar">А</div><strong>Вы</strong><small class="rail-balance" id="rail-money">$ 15 000</small></div>
+          <div class="rail-player" hidden><div class="rail-avatar rail-avatar--red">2</div><strong>Игрок 2</strong><small class="rail-balance">$ —</small></div>
+          <div class="rail-player" hidden><div class="rail-avatar rail-avatar--green">3</div><strong>Игрок 3</strong><small class="rail-balance">$ —</small></div>
+          <div class="rail-player" hidden><div class="rail-avatar rail-avatar--gray">4</div><strong>Игрок 4</strong><small class="rail-balance">$ —</small></div>
+        </aside>
+        <section class="board-panel">
+          <div class="board-shell"><div class="board" id="board" aria-label="Игровое поле"></div><div class="player-tokens" id="player-tokens" aria-hidden="true"></div><div class="board-center"><div class="toast" id="toast" role="status"></div><span class="turn-kicker">Ваш ход</span><div class="dice-box" id="dice-box" aria-label="Игральный кубик"></div><p class="turn-message" id="dice-message" aria-live="polite">Загружаем игру…</p><div class="turn-actions" id="turn-actions"><button class="roll-button" id="roll-button" type="button">Бросить кубик</button><button class="bail-button" id="bail-button" type="button" hidden>Выйти за $2 000</button><button class="center-upgrade" id="upgrade-button" type="button" disabled hidden>Купить</button></div><div class="auction-actions" id="auction-actions" hidden><strong id="auction-status"></strong><div class="auction-actions__buttons"><button id="auction-bid-button" type="button">Сделать ставку +$100</button><button class="auction-decline" id="auction-decline-button" type="button">Отказаться</button></div><button id="auction-start-button" type="button">Выставить на аукцион</button></div><div class="result-panel" id="result-panel" hidden><div class="result-animation" id="result-animation"></div><h2 id="result-title"></h2><button class="result-leave" id="result-leave" type="button">Выйти</button></div></div></div>
+        </section>
+        <aside class="property-info" id="property-info" aria-hidden="true">
+          <section class="property-info__dialog" role="dialog" aria-modal="true" aria-labelledby="property-info-title">
+            <button class="property-info__close" id="property-info-close" type="button" aria-label="Закрыть">×</button>
+            <div id="property-info-content"><div class="property-info__empty">Выберите отель на поле, чтобы посмотреть подробности</div></div>
+          </section>
+        </aside>
+
+      </div>
+      <div class="rules-modal" id="rules-modal" aria-hidden="true"><section class="rules-dialog" role="dialog" aria-modal="true" aria-labelledby="rules-title"><button class="rules-close" id="rules-close" type="button" aria-label="Закрыть">×</button><h2 id="rules-title">Правила партии</h2><div class="rules-list"><article><div><strong>Старт</strong><p>За полный круг или попадание на старт вы получаете $2 000.</p></div></article><article><div><strong>Развитие</strong><p>Все отели начинают с фактической категории 1★. При улучшении место полностью заменяется реальным отелем следующей категории из Туту.</p></div></article><article><div><strong>Тюрьма</strong><p>При попадании в тюрьму игрок пропускает два следующих хода.</p></div></article><article><div><strong>События</strong><p>Клетки «Шанс» и «Налог» могут изменить ваш капитал.</p></div></article></div></section></div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+    <script type="module" src="/scripts/game/main.js?v=5"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+.env
+node_modules/
+.tools/
+npm-debug.log*
+.DS_Store
+Thumbs.db
+README.md
+__pycache__/
+*.pyc
+.local-logs/
+.local-bin/
+.local-go-cache/
+*.tar

@@ -1,0 +1,42 @@
+:root {
+	color-scheme: light;
+	--font-sans: "Google Sans", "Product Sans", Arial, sans-serif;
+	--color-bg: #fff;
+	--color-surface: #fff;
+	--color-text: #24231f;
+	--color-muted: #8f8d85;
+	--color-line: #e7e4dc;
+	--color-primary: #2f278d;
+}
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+html {
+	min-width: 320px;
+	background: var(--color-bg);
+}
+body {
+	margin: 0;
+	min-width: 320px;
+	min-height: 100vh;
+	background: var(--color-bg);
+	color: var(--color-text);
+	font-family: var(--font-sans);
+}
+button, input {
+	font: inherit;
+}
+button {
+	cursor: pointer;
+}
+img {
+	display: block;
+	max-width: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		scroll-behavior: auto !important;
+		animation-duration: .01ms !important;
+		transition-duration: .01ms !important;
+	}
+}

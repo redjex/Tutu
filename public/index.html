@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Открытые лобби</title>
+    <link rel="icon" href="/assets/images/tutu.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles/base.css" />
+    <link rel="stylesheet" href="/styles/lobby.css" />
+  </head>
+  <body>
+    <main class="lobbies-page">
+      <header class="profile-bar">
+        <img src="/assets/images/tutu_logo.svg" alt="Туту" width="96" height="48" />
+        <button class="profile-entry" id="profile-entry" type="button"><span class="profile-entry__avatar oim-door-arrow-right" aria-hidden="true"></span><strong>Войти</strong></button>
+      </header>
+
+      <div class="lobbies-layout">
+        <aside class="filters" aria-label="Фильтры лобби">
+          <div class="filters__heading"><h2>Фильтры</h2><button type="button" id="reset-filters">Сбросить</button></div>
+
+          <fieldset class="filter-group">
+            <legend>Страна</legend>
+            <label><input type="radio" name="country" value="all" checked /><span>Все страны</span></label>
+            <label><input type="radio" name="country" value="RU" /><span><img src="/assets/images/flags/ru.svg" alt="" />Россия</span></label>
+            <label><input type="radio" name="country" value="TR" /><span><img src="/assets/images/flags/tr.svg" alt="" />Турция</span></label>
+            <label><input type="radio" name="country" value="TH" /><span><img src="/assets/images/flags/th.svg" alt="" />Таиланд</span></label>
+            <label><input type="radio" name="country" value="AE" /><span><img src="/assets/images/flags/ae.svg" alt="" />ОАЭ</span></label>
+            <label><input type="radio" name="country" value="IT" /><span><img src="/assets/images/flags/it.svg" alt="" />Италия</span></label>
+            <div class="country-pagination"><button type="button" id="country-prev" aria-label="Предыдущие страны">‹</button><span id="country-page">1 / 1</span><button type="button" id="country-next" aria-label="Следующие страны">›</button></div>
+          </fieldset>
+
+          <fieldset class="filter-group">
+            <legend>Режим</legend>
+            <label class="check"><input type="checkbox" name="mode" value="classic" checked /><span>Классический</span></label>
+            <label class="check"><input type="checkbox" name="mode" value="fast" checked /><span>Быстрый</span></label>
+          </fieldset>
+
+        </aside>
+
+        <section class="lobbies" aria-live="polite">
+          <div class="lobbies__toolbar"><div class="lobbies__meta"><strong id="lobbies-count">0 комнат</strong><span>Обновлено сейчас</span></div><button class="create-lobby-button" id="create-lobby-button" type="button"><img src="/assets/images/add.svg" alt="" />Создать лобби</button></div>
+          <div class="lobbies__list" id="lobbies-list"></div>
+        </section>
+      </div>
+    </main>
+
+    <div class="profile-backdrop" id="create-backdrop" aria-hidden="true">
+      <section class="profile-dialog create-dialog" role="dialog" aria-modal="true" aria-labelledby="create-title">
+        <span class="profile-dialog__icon"><img src="/assets/images/add.svg" alt="" /></span>
+        <h2 id="create-title">Создать лобби</h2>
+        <p>Выберите параметры новой игровой комнаты.</p>
+        <form id="create-lobby-form">
+          <label class="custom-field">Страна<div class="custom-select" data-custom-select><input type="hidden" name="country" value="RU" /><button class="custom-select__trigger" type="button" aria-expanded="false"><span>Россия</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg></button><div class="custom-select__options"><button type="button" data-value="RU">Россия</button><button type="button" data-value="TR">Турция</button><button type="button" data-value="TH">Таиланд</button><button type="button" data-value="AE">ОАЭ</button><button type="button" data-value="IT">Италия</button></div><div class="custom-select__pagination" hidden><button type="button" data-country-prev aria-label="Предыдущие страны">‹</button><span data-country-page>1 / 1</span><button type="button" data-country-next aria-label="Следующие страны">›</button></div></div></label>
+          <label class="custom-field">Режим<div class="custom-select" data-custom-select><input type="hidden" name="mode" value="classic" /><button class="custom-select__trigger" type="button" aria-expanded="false"><span>Классический</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg></button><div class="custom-select__options"><button type="button" data-value="classic">Классический</button><button type="button" data-value="fast">Быстрый</button></div></div></label>
+          <label class="custom-field">Доступ<div class="custom-select" data-custom-select><input type="hidden" name="visibility" value="public" /><button class="custom-select__trigger" type="button" aria-expanded="false"><span>Публичное</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg></button><div class="custom-select__options"><button type="button" data-value="public">Публичное</button><button type="button" data-value="private">Приватное</button></div></div></label>
+          <label class="custom-field">Количество игроков<div class="custom-select" data-custom-select><input type="hidden" name="capacity" value="4" /><button class="custom-select__trigger" type="button" aria-expanded="false"><span>4 игрока</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" /></svg></button><div class="custom-select__options"><button type="button" data-value="2">2 игрока</button><button type="button" data-value="3">3 игрока</button><button type="button" data-value="4">4 игрока</button></div></div></label>
+          <div class="create-dialog__actions"><button class="create-dialog__cancel" id="create-cancel" type="button">Отмена</button><button class="create-dialog__submit" type="submit">Создать комнату <img src="/assets/images/next.svg" alt="" /></button></div>
+        </form>
+      </section>
+    </div>
+
+    <div class="loader is-hidden" id="loading-backdrop" aria-label="Загрузка" aria-hidden="true">
+      <img src="/assets/images/tutu.svg" alt="Tutu" />
+    </div>
+
+    <script src="/scripts/app-config.js"></script>
+    <script type="module" src="/scripts/lobby/main.js?v=4"></script>
+  </body>
+</html>

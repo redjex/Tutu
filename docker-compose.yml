@@ -1,0 +1,36 @@
+services:
+  data:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    environment:
+      TUTU_MCP_URL: https://mcp.tutu.ru/mcp
+      HOTEL_CACHE_TTL_SECONDS: 900
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8091/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+  game:
+    build:
+      context: .
+      dockerfile: Go.Dockerfile
+    environment:
+      PORT: 5510
+      PYTHON_SERVICE_URL: http://data:8091
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:5510}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:5510}
+      SESSION_STORE_PATH: ${SESSION_STORE_PATH:-/data/sessions.json}
+    depends_on:
+      data:
+        condition: service_healthy
+    ports:
+      - "5510:5510"
+    volumes:
+      - game-data:/data
+
+volumes:
+  game-data:
